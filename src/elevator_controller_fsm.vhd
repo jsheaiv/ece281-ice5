@@ -95,7 +95,13 @@ begin
 	-- CONCURRENT STATEMENTS ------------------------------------------------------------------------------
 	
 	-- Next State Logic
-  
+	f_Q_next <= <state> when (<condition>) else -- going up
+            ...
+            ...
+            ... -- going down
+            ...
+            ... else
+            ...; -- default case
 	-- Output logic
 
 	-------------------------------------------------------------------------------------------------------
