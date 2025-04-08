@@ -93,23 +93,51 @@ architecture Behavioral of elevator_controller_fsm is
 begin
 
 	-- CONCURRENT STATEMENTS ------------------------------------------------------------------------------
-	
-	-- Next State Logic
-	f_Q_next <= <state> when (<condition>) else -- going up
-            ...
-            ...
-            ... -- going down
-            ...
-            ... else
-            ...; -- default case
-	-- Output logic
+--	Inputs:
+--    i_up_down : '1' is Up, '0' is Down
+--    i_stop    : '1' is Stop, '0' is Go
 
+--Outputs:
+--    o_floor:
+--        Floor 1: "0001"
+--        Floor 2: "0010"
+--        Floor 3: "0011"
+--        Floor 4: "0100"
+	-- Next State Logic
+	f_Q_next <= s_floor1 when f_Q = s_floor2 and i_up_down = '0' else -- going down to floor 1
+            s_floor2 when f_Q = s_floor1 and i_up_down = '1' else -- going up to floor 2
+            s_floor2 when f_Q = s_floor3 and i_up_down = '0' else -- going down to floor 2
+            s_floor3 when f_Q = s_floor2 and i_up_down = '1' else -- going up to floor 3
+            s_floor3 when f_Q = s_floor4 and i_up_down = '0' else -- going down to floor 3
+            s_floor4 when f_Q = s_floor3 and i_up_down = '1' else -- going up to floor 4
+            f_Q; -- default case
+	-- Output logic
+    with f_Q select
+    o_floor <= "0001" when s_floor1,
+            "0010" when s_floor2,
+            "0011" when s_floor3,
+            "0100" when s_floor4,
+            "0001" when others; -- default is floor1
 	-------------------------------------------------------------------------------------------------------
 	
 	-- PROCESSES ------------------------------------------------------------------------------------------	
 	
 	-- State register ------------
-	
+	register_proc : process (i_clk, i_reset,i_stop)
+	begin
+    if (rising_edge(i_clk) and i_stop = '0') then
+        if i_reset = '1' then
+            f_Q <= s_floor2;
+        else 
+            f_Q <= f_Q_next;    -- next state becomes current state
+        end if;
+--        if i_stop = '1' then
+--            f_Q <= f_Q;
+--        else
+--            f_Q <= f_Q_next;
+--        end if;
+    end if;
+	end process register_proc;
 	
 	-------------------------------------------------------------------------------------------------------
 	
